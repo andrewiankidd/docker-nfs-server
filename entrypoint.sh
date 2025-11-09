@@ -272,14 +272,23 @@ is_kernel_module_loaded() {
 }
 
 is_granted_linux_capability() {
-
+  # Original check (Debian/Ubuntu capsh format: "Current: = ...")
   if capsh --print | grep -Eq "^Current: = .*,?${1}(,|$)"; then
+    return 0
+  fi
+
+  # Fallback check (Alpine capsh format: "Current: ...")
+  if capsh --print 2>/dev/null \
+    | sed -n -e 's/^Current:[[:space:]]*=[[:space:]]*//p' -e 's/^Current:[[:space:]]*//p' \
+    | tr ',' '\n' \
+    | sed 's/[+=].*$//' \
+    | sed 's/^ *//;s/ *$//' \
+    | grep -Fxq "${1}"; then
     return 0
   fi
 
   return 1
 }
-
 
 ######################################################################################
 ### runtime configuration assertions
