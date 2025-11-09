@@ -272,18 +272,18 @@ is_kernel_module_loaded() {
 }
 
 is_granted_linux_capability() {
-  # Original check (Debian/Ubuntu capsh format: "Current: = ...")
+  # original check (Debian-style “Current: = …cap”)
   if capsh --print | grep -Eq "^Current: = .*,?${1}(,|$)"; then
     return 0
   fi
 
-  # Fallback check (Alpine capsh format: "Current: ...")
+  # else-if: handle Alpine-style header by checking Bounding set
+  cap="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
   if capsh --print 2>/dev/null \
-    | sed -n -e 's/^Current:[[:space:]]*=[[:space:]]*//p' -e 's/^Current:[[:space:]]*//p' \
+    | sed -n 's/^Bounding set =//p' \
     | tr ',' '\n' \
-    | sed 's/[+=].*$//' \
     | sed 's/^ *//;s/ *$//' \
-    | grep -Fxq "${1}"; then
+    | grep -Fxq "$cap"; then
     return 0
   fi
 
