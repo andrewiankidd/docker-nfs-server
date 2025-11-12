@@ -148,7 +148,7 @@ term_process() {
 
   if [[ -n $pid ]]; then
     log "terminating $base"
-    kill "$pid"
+    kill $pid
     on_failure warn "unable to terminate $base"
   else
     log "$base was not running"
@@ -272,14 +272,23 @@ is_kernel_module_loaded() {
 }
 
 is_granted_linux_capability() {
-
+  # original check (Debian-style “Current: = …cap”)
   if capsh --print | grep -Eq "^Current: = .*,?${1}(,|$)"; then
+    return 0
+  fi
+
+  # else-if: handle Alpine-style header by checking Bounding set
+  cap="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  if capsh --print 2>/dev/null \
+    | sed -n 's/^Bounding set =//p' \
+    | tr ',' '\n' \
+    | sed 's/^ *//;s/ *$//' \
+    | grep -Fxq "$cap"; then
     return 0
   fi
 
   return 1
 }
-
 
 ######################################################################################
 ### runtime configuration assertions
@@ -527,10 +536,20 @@ boot_helper_mount() {
   on_failure stop "unable to mount $type filesystem onto $path"
 }
 
+kernel_exposes_nfsd_version() {
+
+  local -r v=$1
+  grep -Eq "(^|[[:space:]])[+-]?${v}([[:space:]]|$)" "$MOUNT_PATH_NFSD/versions"
+}
+
 boot_helper_get_version_flags() {
 
   local -r requested_version="${state[$STATE_NFS_VERSION]}"
-  local flags=('--nfs-version' "$requested_version" '--no-nfs-version' 2)
+  local flags=('--nfs-version' "$requested_version")
+
+  if kernel_exposes_nfsd_version 2; then
+    flags+=('--no-nfs-version' 2)
+  fi
 
   if ! is_nfs3_enabled; then
     flags+=('--no-nfs-version' 3)
@@ -627,7 +646,7 @@ boot_main_rpcbind() {
 
   local args=('-s')
   if is_logging_debug; then
-    arg+=('-d')
+    args+=('-d')
   fi
   boot_helper_start_daemon 'starting rpcbind' $PATH_BIN_RPCBIND "${args[@]}"
 }
