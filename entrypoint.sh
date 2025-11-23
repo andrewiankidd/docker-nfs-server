@@ -542,12 +542,18 @@ kernel_exposes_nfsd_version() {
   grep -Eq "(^|[[:space:]])[+-]?${v}([[:space:]]|$)" "$MOUNT_PATH_NFSD/versions"
 }
 
+userspace_exposes_nfsd_version() {
+
+  local -r v=$1
+  rpc.nfsd --help 2>&1 | grep -Eq "[[:space:]]$v([[:space:]]|$)"
+}
+
 boot_helper_get_version_flags() {
 
   local -r requested_version="${state[$STATE_NFS_VERSION]}"
   local flags=('--nfs-version' "$requested_version")
 
-  if kernel_exposes_nfsd_version 2; then
+  if kernel_exposes_nfsd_version 2 && userspace_exposes_nfsd_version 2; then
     flags+=('--no-nfs-version' 2)
   fi
 
@@ -570,6 +576,7 @@ boot_helper_start_daemon() {
   local -r daemon_args=("$@")
 
   log "$msg"
+  log "$daemon ${daemon_args[*]}"
   "$daemon" "${daemon_args[@]}"
   on_failure stop "$daemon failed"
 }
