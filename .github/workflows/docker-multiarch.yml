@@ -4,9 +4,17 @@ on:
   pull_request:
     branches:
       - '**'
+    paths:
+      - src/entrypoint.sh
+      - src/Dockerfile
+      - src/.dockerignore
   push:
     tags:
       - 'v*'
+    paths:
+      - src/entrypoint.sh
+      - src/Dockerfile
+      - src/.dockerignore
   workflow_dispatch:
 
 jobs:
@@ -77,8 +85,8 @@ jobs:
         if: needs.meta.outputs.do_push != 'true'
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./src
+          file: ./src/Dockerfile
           platforms: ${{ matrix.platform }}
           push: false
           provenance: false
@@ -89,8 +97,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./src
+          file: ./src/Dockerfile
           platforms: ${{ matrix.platform }}
           provenance: false
           sbom: false

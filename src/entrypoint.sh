@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 #
+# andrewkidd/nfs-server: A lightweight, robust, and flexible Alpine-based NFS server container for ARM/x86 hosts.
+#
+# https://hub.docker.com/r/andrewkidd/nfs-server
+# https://github.com/andrewkidd/nfs-server
+#
+# FORKED FROM ORIGINAL SOURCE BELOW THIS LINE
+######################################################################################
 # ehough/docker-nfs-server: A lightweight, robust, flexible, and containerized NFS server.
 #
 # https://hub.docker.com/r/erichough/nfs-server
