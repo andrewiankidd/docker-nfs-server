@@ -2,7 +2,7 @@ ARG BUILD_FROM=alpine:latest
 
 FROM $BUILD_FROM
 
-RUN apk --update --no-cache add bash nfs-utils libcap libcap-utils && \
+RUN apk --update --no-cache add bash nfs-utils libcap libcap-utils dos2unix && \
     # remove the default config files
     rm -v /etc/idmapd.conf /etc/exports
 
@@ -16,4 +16,5 @@ EXPOSE 2049
 
 # setup entrypoint
 COPY ./entrypoint.sh /usr/local/bin
+RUN dos2unix /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
