@@ -57,10 +57,6 @@ services:
     profiles:
       - netboot
       - debian-netboot
-    command: >
-      sh -c "mount -t nfsd nfsd /proc/fs/nfsd 2>/dev/null || true;
-             echo '-2 +3 -4 -4.1 -4.2' > /proc/fs/nfsd/versions 2>/dev/null || true;
-             exec /usr/local/bin/entrypoint.sh"
     env_file:
       - .env
     environment:
