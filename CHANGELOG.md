@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+
+## [v2.2.6] 2025-11-23
+
+### Added
+* feat: add ARM support ([60c0ef9](https://github.com/andrewiankidd/nfs-server/commit/60c0ef99ebb76b5c937a065f6f4857c49b9086d3)) ([ehough#34](https://github.com/ehough/docker-nfs-server/issues/34))
+
+### Fixed
+* fix(nfs): correct v2 detection logic and add daemon command logging ([e409b92](https://github.com/andrewiankidd/nfs-server/commit/e409b921b3fe6d8f1d1cacbf738be0426ab00dc7))
+* fix(nfs): auto disable nfs2 when kernel exposes only v3/v4 ([702e4bf](https://github.com/andrewiankidd/nfs-server/commit/702e4bf929958d8cc050d27e0ae01176ed05ce84))
+* fix(entrypoint): correct cap matching for alpine variant ([de82ca4](https://github.com/andrewiankidd/nfs-server/commit/de82ca4f3eeb93db56a0a71070ab7722099238c4))
+* fix(entrypoint): normalize is_granted_linux_capability across capsh variants ([55de31a](https://github.com/andrewiankidd/nfs-server/commit/55de31a590544878ab3c69741aa0a41d44c70c5d))
+* fix(dockerfile): add capsh deps ([5987efc](https://github.com/andrewiankidd/nfs-server/commit/5987efc20bc211a0cde773d040df6f4322830705))
+
+
 ## [unreleased]
 
 ### Fixed
