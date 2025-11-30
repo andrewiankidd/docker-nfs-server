@@ -638,13 +638,13 @@ boot_main_mountd() {
   local version_flags
   read -r -a version_flags <<< "$(boot_helper_get_version_flags)"
   local -r port="${state[$STATE_MOUNTD_PORT]}"
-  local args=('--port' "$port" "${version_flags[@]}")
+  local args=('--port' "$port" '--foreground' "${version_flags[@]}")
   if is_logging_debug; then
     args+=('--debug' 'all')
   fi
 
   # yes, rpc.mountd is required even for NFS v4: https://forums.gentoo.org/viewtopic-p-7724856.html#7724856
-  boot_helper_start_daemon "starting rpc.mountd on port $port" $PATH_BIN_MOUNTD "${args[@]}"
+  boot_helper_start_non_daemon "starting rpc.mountd on port $port" $PATH_BIN_MOUNTD "${args[@]}"
 }
 
 boot_main_rpcbind() {
@@ -906,6 +906,16 @@ main() {
 
   init
   boot
+
+  # sanity-check that critical daemons are still up before declaring ready
+  if is_nfs3_enabled; then
+    sleep 1
+    if ! pidof rpc.mountd >/dev/null 2>&1; then
+      log_error "rpc.mountd exited after start; refusing to stay up without NFSv3 mountd"
+      stop
+    fi
+  fi
+
   summarize
   hangout
 }
